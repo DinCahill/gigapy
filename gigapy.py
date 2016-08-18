@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 
-import os, glob, csv, xmltodict, argparse, sys, psutil, subprocess
+import os
+import glob
+import csv
+import xmltodict
+import argparse
+import sys
+import psutil
+import subprocess
 
 OHMDir = 'G:\Downloads\OpenHardwareMonitor'
 SIVDir = 'C:\Program Files (x86)\Gigabyte\SIV'
@@ -8,17 +15,20 @@ ProfileDir = os.path.join(SIVDir, 'Profile')
 thermaldPath = os.path.join(SIVDir, 'thermald.exe')
 
 OHMFile = glob.glob(
-	os.path.join(OHMDir, '*.csv'))[-1]
+    os.path.join(OHMDir, '*.csv'))[-1]
 
-#with open(OHMFile, newline='') as csvfile:
+# with open(OHMFile, newline='') as csvfile:
 #	csvreader = csv.reader(csvfile)
 #	print(next(csvreader))
 
+
 class MyParser(argparse.ArgumentParser):
-        def error(self, message):
-            sys.stderr.write('error: %s\n' % message)
-            self.print_help()
-            sys.exit(2)
+
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
 
 def getFixedSpeed(fan):
     FanFile = os.path.join(ProfileDir, 'FanConfig{0}.xml'.format(fan))
@@ -31,7 +41,7 @@ def getFixedSpeed(fan):
         print('FanFile: {0}'.format(FanFile))
         return doc['SmartFanConfig']['FixedModeConfig']['StartPWM']
 
-            
+
 def setFixedSpeed(fan, speed):
     FanFile = os.path.join(ProfileDir, 'FanConfig{0}.xml'.format(fan))
     if not os.path.exists(FanFile):
@@ -46,7 +56,7 @@ def setFixedSpeed(fan, speed):
         fd.write(xmltodict.unparse(doc, pretty=True))
         fd.truncate()
         print('FanFile: {0}'.format(FanFile))
-        
+
 
 def startThermald():
     for pid in psutil.pids():
