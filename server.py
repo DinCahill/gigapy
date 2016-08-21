@@ -42,7 +42,7 @@ if __name__ == '__main__':
     ohm = readers.OHMReader('G:\Downloads\OpenHardwareMonitor', q)
     ohm.start()
 
-    print('Collecting 13 temperatures... ', end='')
+    print('Collecting 13 temperatures... ', end='', flush=True)
     while True:
         temp = readAllTemps(q, temps)
 
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         syspwm = sysprofile(smooth_temp)
         print(
             'temp: {0}, smooth_temp: {1}, pwm: {2}, vrm: {3}'.format(
-                temp, smooth_temp, pwm, syspwm))
+                temp, smooth_temp, pwm, syspwm), flush=True)
 
         # Set the fan speed after every fourth temperature reading
         if i == 3:

@@ -30,7 +30,7 @@ class OHMFileSystemEventHandler(PatternMatchingEventHandler):
         self.temp_index = -1
         for k, v in headings:
             if 'temperature' in v:
-                print('Using {0} from OHM'.format(v))
+                print('Using {0} from OHM'.format(v), flush=True)
                 self.temp_index = k
 
         # Discard existing rows
@@ -41,12 +41,17 @@ class OHMFileSystemEventHandler(PatternMatchingEventHandler):
         super(OHMFileSystemEventHandler, self).__init__()
         self.qOut = qOut
         self.qNewCSV = qNewCSV
-        self.setCSV(OHMFile)
+        self.OHMFile = OHMFile
+        if self.OHMFile != '':
+            self.setCSV(self.OHMFile)
 
     def on_modified(self, event):
         src = os.path.normpath(event.src_path)
         if self.OHMFile != src:
             self.qNewCSV.put(src)
+
+        if not self.OHMFile:
+            return
 
         try:
             while True:
@@ -60,8 +65,9 @@ class OHMReader(Reader):
     def __init__(self, OHMDir, qOut):
         super(OHMReader, self).__init__()
         self.OHMDir = OHMDir
-        self.OHMFile = glob.glob(
-            os.path.join(self.OHMDir, '*.csv'))[-1]
+        files = glob.glob(
+            os.path.join(self.OHMDir, '*.csv'))
+        self.OHMFile = files[-1] if len(files) > 0 else ''
 
         self.qOut = qOut
 
@@ -79,7 +85,7 @@ class OHMReader(Reader):
             return False
         observer.unschedule(watch)
         self.OHMFile = newOHMFile
-        print('New CSV: {}'.format(self.OHMFile))
+        print('New CSV: {}'.format(self.OHMFile), flush=True)
         return True
 
     def run(self):
