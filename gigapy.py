@@ -9,17 +9,9 @@ import sys
 import psutil
 import subprocess
 
-OHMDir = 'G:\Downloads\OpenHardwareMonitor'
 SIVDir = 'C:\Program Files (x86)\Gigabyte\SIV'
 ProfileDir = os.path.join(SIVDir, 'Profile')
 thermaldPath = os.path.join(SIVDir, 'thermald.exe')
-
-OHMFile = glob.glob(
-    os.path.join(OHMDir, '*.csv'))[-1]
-
-# with open(OHMFile, newline='') as csvfile:
-#	csvreader = csv.reader(csvfile)
-#	print(next(csvreader))
 
 
 class MyParser(argparse.ArgumentParser):
