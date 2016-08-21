@@ -8,6 +8,7 @@ import argparse
 import sys
 import psutil
 import subprocess
+import time
 
 SIVDir = 'C:\Program Files (x86)\Gigabyte\SIV'
 ProfileDir = os.path.join(SIVDir, 'Profile')
@@ -57,11 +58,8 @@ def startThermald():
                 p = psutil.Process(pid)
                 p.terminate()
                 try:
-                    if p.wait(timeout=10):
-                        print('Could not kill thermald')
-                        exit(1)
-                    else:
-                        print('Killed thermald')
+                    p.wait(timeout=10)
+                    print('Killed thermald')
                 except psutil.TimeoutExpired:
                     print('error: Timeout for killing thermald expired')
                     exit(1)
@@ -69,6 +67,9 @@ def startThermald():
             print('warning: NoSuchProcess')
 
     thermald = subprocess.Popen(thermaldPath)
+    time.sleep(1.5)
+    thermald.terminate()
+    thermald.wait()
     print('Started thermald')
 
 
