@@ -1,0 +1,5 @@
+xmltodict
+psutil
+numpy
+scipy
+
