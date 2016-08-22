@@ -20,6 +20,13 @@ def moving_average(a, n=3):
     return ret[n - 1:] / n
 
 
+def readTemp(csvreader, temps):
+    line = next(csvreader)
+    temp = float(line[temp_index])
+    temps.append(temp)  # Keep a deque of temperatures
+    return temp
+
+
 profile = profiles.normal
 sysprofile = profiles.low
 
@@ -43,36 +50,37 @@ if __name__ == '__main__':
         for line in csvreader:
             pass
 
-        temp = -1
-        pwm = -1
         currentpwm = -1
         currentsyspwm = -1
-        i = 0
+        i = 3
         b, a = butter(3, 0.05)  # Low-pass filter
 
+        print('Collecting 13 temperatures... ', end='')
         while True:
+            time.sleep(1)
             # Get the latest row. If there isn't a new one, skip to the sleep
             try:
-                line = next(csvreader)
+                temp = readTemp(csvreader, temps)
                 # If there are multiple new rows, get the latest
                 try:
                     while True:
-                        line = next(csvreader)
+                        temp = readTemp(csvreader, temps)
                 except StopIteration:
                     pass
 
-                # Keep a deque of temperatures
-                temp = float(line[temp_index])
-                temps.append(temp)
+                # Needs at least 13 temperatures. Print them out as we go
+                if len(temps) < 13:
+                    print('{0} '.format(temp), end='', flush=True)
+                    continue
+                if len(temps) == 13:
+                    print('{0} '.format(temp), flush=True)
 
-                # Needs at least 13 temperatures
-                if len(temps) >= 13:
-                    smooth_temps = filtfilt(b, a, temps)
                 # Limit the deque length
                 if len(temps) > 100:
                     temps.popleft()
 
-                smooth_temp = smooth_temps[-1] if len(smooth_temps) > 0 else 0
+                smooth_temps = filtfilt(b, a, temps)
+                smooth_temp = smooth_temps[-1]
                 pwm = profile(smooth_temp)
                 syspwm = sysprofile(smooth_temp)
                 print(
@@ -96,5 +104,3 @@ if __name__ == '__main__':
                     i += 1
             except StopIteration:
                 pass
-
-            time.sleep(1)
