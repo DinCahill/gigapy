@@ -10,7 +10,7 @@ from queue import Queue
 
 
 def readTemp(q, temps):
-    temp = q.get()[0]
+    temp = q.get()
     temps.append(temp)
     return temp
 

@@ -2,4 +2,4 @@ xmltodict
 psutil
 numpy
 scipy
-
+watchdog
