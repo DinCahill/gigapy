@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-import glob
-import csv
 import xmltodict
 import argparse
 import sys

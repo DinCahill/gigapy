@@ -4,7 +4,6 @@ import collections
 import csv
 import gigapy
 import glob
-import math
 import numpy as np
 import os
 import time
