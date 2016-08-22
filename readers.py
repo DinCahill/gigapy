@@ -4,7 +4,7 @@ import threading
 import os
 from queue import Queue
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import PatternMatchingEventHandler
 
 
 def readTemp(csvreader, index):
@@ -16,7 +16,8 @@ class Reader(threading.Thread):
     pass
 
 
-class OHMFileSystemEventHandler(FileSystemEventHandler):
+class OHMFileSystemEventHandler(PatternMatchingEventHandler):
+    patterns = ['*.csv']
 
     def setCSV(self, OHMFile):
         self.OHMFile = os.path.normpath(OHMFile)
@@ -37,6 +38,7 @@ class OHMFileSystemEventHandler(FileSystemEventHandler):
             pass
 
     def __init__(self, OHMFile, qOut, qNewCSV):
+        super(OHMFileSystemEventHandler, self).__init__()
         self.qOut = qOut
         self.qNewCSV = qNewCSV
         self.setCSV(OHMFile)
