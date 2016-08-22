@@ -30,36 +30,48 @@ if __name__ == '__main__':
 
     with open(OHMFile, newline='') as csvfile:
         csvreader = csv.reader(csvfile)
+
+        # Search for the CPU temperature column
         headings = enumerate(next(csvreader))
         temp_index = -1
         for k, v in headings:
             if 'temperature' in v:
                 print('Heading {0}: {1}'.format(k, v))
                 temp_index = k
+
+        # Discard existing rows
+        for line in csvreader:
+            pass
+
         temp = -1
         pwm = -1
         currentpwm = -1
         currentsyspwm = -1
         i = 0
-        for line in csvreader:
-            pass
+        b, a = butter(3, 0.05)  # Low-pass filter
 
-        b, a = butter(3, 0.05)
         while True:
+            # Get the latest row. If there isn't a new one, skip to the sleep
             try:
                 line = next(csvreader)
+                # If there are multiple new rows, get the latest
                 try:
                     while True:
                         line = next(csvreader)
                 except StopIteration:
                     pass
 
+                # Keep a deque of temperatures
                 temp = float(line[temp_index])
                 temps.append(temp)
+
+                # Needs at least 13 temperatures
                 if len(temps) >= 13:
                     smooth_temps = filtfilt(b, a, temps)
+                # Limit the deque length
                 if len(temps) > 100:
                     temps.popleft()
+
                 smooth_temp = smooth_temps[-1] if len(smooth_temps) > 0 else 0
                 pwm = profile(smooth_temp)
                 syspwm = sysprofile(smooth_temp)
@@ -67,9 +79,10 @@ if __name__ == '__main__':
                     'temp: {0}, smooth_temp: {1}, pwm: {2}, vrm: {3}'.format(
                         temp, smooth_temp, pwm, syspwm))
 
+                # Set the fan speed after every fourth temperature reading
                 if i == 3:
-                    changed = False
-                    for new, current, fanid in zip(
+                    changed = False  # Only set the speed if it has changed
+                    for new, current, fanid in zip(  # Set each fan individually
                             [pwm, syspwm], [currentpwm, currentsyspwm], [0, 1]):
                         if new != current:
                             gigapy.setFixedSpeed(fanid, pwm)
