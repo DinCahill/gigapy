@@ -71,7 +71,7 @@ if __name__ == '__main__':
             for new, current, fanid in zip(  # Set each fan individually
                     [pwm, syspwm], [currentpwm, currentsyspwm], [0, 1]):
                 if new != current:
-                    gigapy.setFixedSpeed(fanid, pwm)
+                    gigapy.setFixedSpeed(fanid, new)
                     changed = True
             if changed:
                 gigapy.startThermald()
